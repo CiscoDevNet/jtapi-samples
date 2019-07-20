@@ -24,8 +24,7 @@ buildNumber.properties
 .settings/
 .classpath
 .project
-.vscode/
-!.vscode/launch.json
+.vscode/settings.json
 
 # JTAPI log files
 CiscoJtapi*
