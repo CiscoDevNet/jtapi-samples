@@ -1,4 +1,4 @@
-package com.cisco.jtapi.makecall;
+package com.cisco.jtapi.senddata;
 
 // Copyright (c) 2019 Cisco and/or its affiliates.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -17,10 +17,11 @@ package com.cisco.jtapi.makecall;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Basic A->B make call sample
+// Opens a phone and performs CiscoTerminal.sendData() method to send a
+// 'Hello World' message to the phone's display.
 
 // Be sure to edit .vscode/launch.json and enter your CUCM/user/line details
-// into the appropriate environment variable items
+// into the environment variable items
 
 // Tested using:
 
@@ -31,7 +32,7 @@ package com.cisco.jtapi.makecall;
 import javax.telephony.*;
 import com.cisco.jtapi.extensions.*;
 
-public class makeCall {
+public class sendData {
 
   public static void main ( String [] args ) throws
   
@@ -67,49 +68,44 @@ public class makeCall {
         handler.providerInService.waitTrue();
     
         // Retrieve and open the Address (line) object for the 'from' DN specified in the environment
-        CiscoAddress fromAddress = (CiscoAddress) provider.getAddress( System.getenv( "CALL_FROM" ) );
+        CiscoAddress address = (CiscoAddress) provider.getAddress( System.getenv( "LINE" ) );
         
-        fromAddress.addObserver( handler );
+        address.addObserver(handler);
 
         // Wait for CiscoAddrInServiceEv
-        System.out.println( "Awaiting CiscoAddrInServiceEv for: " + fromAddress.getName() + "..." );
+        System.out.println( "Awaiting CiscoAddrInServiceEv for: " + address.getName() + "...");
 
         handler.addressInService.waitTrue();
 
         // We'll again use Handler to observe call events for the Address
-        fromAddress.addCallObserver( handler );
+        address.addCallObserver(handler);
 
-        // Retrieve the first Terminal (phone) object for the Address
+        // Retrieve the first Terminal (phone) object for the Address.
         // Could be multiple if it's a shared line
-        CiscoTerminal fromTerminal = (CiscoTerminal) fromAddress.getTerminals()[ 0 ];
+        CiscoTerminal terminal = (CiscoTerminal) address.getTerminals()[0];
 
-        fromTerminal.addObserver( handler );
+        terminal.addObserver(handler);
 
         // Wait for CiscoTermInServiceEv
-        System.out.println( "Awaiting CiscoTermInServiceEv for: " + fromTerminal.getName() + "..." );
+        System.out.println( "Awaiting CiscoTermInServiceEv for: " + terminal.getName() + "...");
 
         handler.terminalInService.waitTrue();
 
-        // Create a new Call object from our provider
-        CiscoCall call = (CiscoCall) provider.createCall ();
+        // Send an IP Phone Services API text object to the phone's display
+        System.out.println( "Sending <CiscoIPPhoneText> object to: "  + terminal.getName() );
+        
+        terminal.sendData( "<CiscoIPPhoneText><Text>Hello World</Text></CiscoIPPhoneText>" );
 
-        // Place the call, specifying our phone, line and destination DN
-        System.out.println( "Awaiting CallActiveEv for: " + call.toString() + "..." );
-
-        call.connect( fromTerminal, fromAddress, System.getenv( "CALL_TO" ) );
-
-        // Wait for CallActiveEv
-        handler.callActive.waitTrue();
-
-        // Wait 5 sec, then drop the call
-        System.out.println( "Sleeping 5 seconds before dropping call: " + call.toString() + "..." );
+        // Wait 5 seconds, then clear the phone display
+        System.out.println(( "Sleeping 5 seconds..." ) );
 
         Thread.sleep( 5000 );
 
-        System.out.println( "Dropping call: " + call.toString() + "..." );
+        System.out.println( "Sending <CiscoIPPhoneExecute> object to: " + terminal.getName() );
 
-        call.drop();
+        terminal.sendData( "<CiscoIPPhoneExecute><ExecuteItem URL='Init:Services' /></CiscoIPPhoneExecute>" );
 
+        // End the program
         System.exit( 0 );
 	}
 }

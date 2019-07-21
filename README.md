@@ -10,6 +10,8 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 - `makeCall` - simple A->B make call example
 
+- `sendData` - use CiscoTerminal.sendData() to send an [IP Phone Services](https://developer.cisco.com/site/ip-phone-services/) XML display object to a phone
+
 ## Requirements
 
 - [Oracle Java](https://www.oracle.com/technetwork/java/javase/downloads/index.html) 1.8
@@ -45,7 +47,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
     Java HotSpot(TM) 64-Bit Server VM (build 25.201-b09, mixed mode)
     ```
 
-1. Open a terminal and use `git` to clone this repository:
+1. Open a terminal window and use `git` to clone this repository:
 
     ```bash
     git clone https://github.com/CiscoDevNet/jtapi-samples.git
@@ -58,12 +60,20 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
     code .
     ```
 
-1. Edit `.vscode/launch.json` to specify environment variables for your CUCM location, user credentials and the 'From' and 'To' numbers for calling
+1. Edit `.vscode/launch.json` to specify environment variables for the samples to run
+
+
+
+    1. Finally, to launch the sample in VS Code, select the **Debug** panel, choose the desired `Debug (Launch) ...` option, and click the green 'Start Debugging' arrow:
+
+        ![Launch](images/launch.png)
+
+## Notes
 
 1. In this project, the 11.5 version of the JTAPI Java libraries have been deployed to the local Maven repo in `lib/`.  If  you want to use a different version in the project:
 
     - Download and install the JTAPI plugin from CUCM (**Applications** / **Plugins**)
-    
+
     - From this repository's root, use Maven to deploy the new version of `jtapi.jar` to the local repo.  You will need to identify the full path to the `jtapi.jar` installed above:
 
         ```bash
@@ -81,8 +91,3 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
             <version>11.5</version>
         </dependency>
         ```
-
-    1. Finally, to launch the sample in VS Code, select the **Debug** panel, the choose `Debug (Launch) makeCall` launch option, and click the green 'Start Debugging' arrow:
-
-        ![Launch](images/launch.png)
-
