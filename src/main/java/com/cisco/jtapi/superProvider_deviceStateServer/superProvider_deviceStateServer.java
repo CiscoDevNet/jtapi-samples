@@ -17,13 +17,17 @@ package com.cisco.jtapi.superProvider_deviceStateServer;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// use CiscoProvider.createTerminal() to dynamically create a terminal by device 
-// name using the Cisco JTAPI 'Superprovider' feature.  Then retrieves and
-// monitors the device for device-side status changes using the 'Device State
-// Server' feature.
+// Demonstrates using CiscoProvider.createTerminal() to dynamically create a 
+// terminal by device name using the Cisco JTAPI 'Superprovider' feature.  Then
+// retrieves and monitors the device for device-side status changes using the 
+// 'Device State Server' feature.
 
 // Be sure to edit .vscode/launch.json and enter your CUCM/user/device details
 // into the appropriate environment variable items
+
+// Note, the JTAPI user must be configured with the additional permission group:
+
+//      Standard CTI Allow Control of All Devices
 
 // Tested using:
 
