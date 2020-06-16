@@ -1,4 +1,4 @@
-package com.cisco.jtapi.senddata;
+package com.cisco.jtapi.superProvider_deviceStateServer;
 
 // Copyright (c) 2019 Cisco and/or its affiliates.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -17,6 +17,7 @@ package com.cisco.jtapi.senddata;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import javax.telephony.*;
 import javax.telephony.events.*;
 import javax.telephony.callcontrol.*;
 import com.cisco.jtapi.extensions.*;
@@ -24,9 +25,9 @@ import com.cisco.cti.util.Condition;
 
 public class Handler implements
 
-    CiscoProviderObserver, 
-    CiscoTerminalObserver, 
-    CiscoAddressObserver, 
+    ProviderObserver, 
+    TerminalObserver, 
+    AddressObserver, 
     CallControlCallObserver {
 
 	public Condition providerInService = new Condition();

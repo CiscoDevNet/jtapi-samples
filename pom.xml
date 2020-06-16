@@ -17,12 +17,17 @@
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>com.cisco</groupId>
-            <artifactId>jtapi-11.5</artifactId>
+            <groupId>com.cisco.jtapi</groupId>
+            <artifactId>jtapi</artifactId>
             <version>11.5</version>
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/jtapi_config</directory>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>

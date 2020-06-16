@@ -1,4 +1,4 @@
-package com.cisco.jtapi.senddata;
+package com.cisco.jtapi.superProvider_deviceStateServer;
 
 // Copyright (c) 2019 Cisco and/or its affiliates.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -17,11 +17,13 @@ package com.cisco.jtapi.senddata;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Opens a phone and performs CiscoTerminal.sendData() method to send a
-// 'Hello World' message to the phone's display.
+// use CiscoProvider.createTerminal() to dynamically create a terminal by device 
+// name using the Cisco JTAPI 'Superprovider' feature.  Then retrieves and
+// monitors the device for device-side status changes using the 'Device State
+// Server' feature.
 
-// Be sure to edit .vscode/launch.json and enter your CUCM/user/line details
-// into the environment variable items
+// Be sure to edit .vscode/launch.json and enter your CUCM/user/device details
+// into the appropriate environment variable items
 
 // Tested using:
 
@@ -30,9 +32,10 @@ package com.cisco.jtapi.senddata;
 // CUCM 11.5
 
 import javax.telephony.*;
+import java.util.*;
 import com.cisco.jtapi.extensions.*;
 
-public class sendData {
+public class superProvider_deviceStateServer {
 
   public static void main ( String [] args ) throws
   
@@ -50,7 +53,7 @@ public class sendData {
 
         // Create the JtapiPeer object, representing the JTAPI library
         System.out.println("Initializing Jtapi");
-        JtapiPeer peer = JtapiPeerFactory.getJtapiPeer( null );
+        CiscoJtapiPeer peer = (CiscoJtapiPeer) JtapiPeerFactory.getJtapiPeer( null );
         
         // Create and open the Provider, representing a JTAPI connection to CUCM CTI Manager
         String providerString = String.format( "%s;login=%s;passwd=%s", 
@@ -58,60 +61,50 @@ public class sendData {
         
         System.out.println( "Connecting Provider: " + providerString );
 
-        Provider provider = peer.getProvider( providerString );
+        CiscoProvider provider = (CiscoProvider) peer.getProvider( providerString );
 
         provider.addObserver( handler );
     
-        // Wait for ProvInServiceEv
         System.out.println( "Awaiting ProvInServiceEv..." );
 
+        // Wait for ProvInServiceEv
         handler.providerInService.waitTrue();
-    
-        // Retrieve and open the Address (line) object for the 'from' DN specified in the environment
-        CiscoAddress address = (CiscoAddress) provider.getAddress( System.getenv( "LINE" ) );
-        
-        address.addObserver(handler);
 
-        // Wait for CiscoAddrInServiceEv
-        System.out.println( "Awaiting CiscoAddrInServiceEv for: " + address.getName() + "...");
-
-        handler.addressInService.waitTrue();
-
-        // We'll again use Handler to observe call events for the Address
-        address.addCallObserver(handler);
-
-        // Retrieve the first Terminal (phone) object for the Address.
-        // Could be multiple if it's a shared line
-        CiscoTerminal terminal = ( CiscoTerminal ) address.getTerminals()[ 0 ];
-
-        CiscoTermEvFilter termFilter = terminal.getFilter();
-
-        termFilter.setDeviceDataEnabled( true );
-
-        terminal.setFilter( termFilter );
+        // Dynamically create a terminal by device name via 'superprovider' feature
+        CiscoTerminal terminal = (CiscoTerminal) provider.createTerminal( System.getenv( "MONITOR_DEVICE_NAME" ) );
 
         terminal.addObserver( handler );
 
-        // Wait for CiscoTermInServiceEv
         System.out.println( "Awaiting CiscoTermInServiceEv for: " + terminal.getName() + "...");
 
+        // Wait for CiscoTermInServiceEv
         handler.terminalInService.waitTrue();
 
-        // Send an IP Phone Services API text object to the phone's display
-        System.out.println( "Sending <CiscoIPPhoneText> object to: "  + terminal.getName() );
-        
-        terminal.sendData( "<CiscoIPPhoneText><Text>Hello World</Text></CiscoIPPhoneText>" );
+        // Create a hash map to get friendly names for the device state
+        Map<Integer, String> stateName = new HashMap<Integer, String>();
+        stateName.put( CiscoTerminal.DEVICESTATE_IDLE, "IDLE" );
+        stateName.put( CiscoTerminal.DEVICESTATE_ACTIVE, "ACTIVE" );
+        stateName.put( CiscoTerminal.DEVICESTATE_ALERTING, "ALERTING" );
+        stateName.put( CiscoTerminal.DEVICESTATE_HELD, "HELD" );
+        stateName.put( CiscoTerminal.DEVICESTATE_UNKNOWN, "UNKNOWN" );
+        stateName.put( CiscoTerminal.DEVICESTATE_WHISPER, "WHISPER" );
 
-        // Wait 5 seconds, then clear the phone display
-        System.out.println(( "Sleeping 5 seconds..." ) );
+        // Check the current device state
+        int state = terminal.getDeviceState();
 
-        Thread.sleep( 5000 );
+        System.out.println( "\nInitial device state: " + stateName.get( state ) );
 
-        System.out.println( "Sending <CiscoIPPhoneExecute> object to: " + terminal.getName() );
+        // Enable filters to receive various device state events
+        CiscoTermEvFilter termFilter = terminal.getFilter();
 
-        terminal.sendData( "<CiscoIPPhoneExecute><ExecuteItem URL='Init:Services' /></CiscoIPPhoneExecute>" );
+        termFilter.setDeviceStateActiveEvFilter( true );
+        termFilter.setDeviceStateAlertingEvFilter( true );
+        termFilter.setDeviceStateHeldEvFilter( true );
+        termFilter.setDeviceStateIdleEvFilter( true );
 
-        // End the program
-        System.exit( 0 );
+        terminal.setFilter( termFilter );
+
+        // The handler thread will run idefinitely, printing any received events
+        System.out.println( "Monitoring device for state changes..." );
 	}
 }

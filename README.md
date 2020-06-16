@@ -8,9 +8,11 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Available samples
 
-- `makeCall` - simple A->B make call example
+- `makeCall` - simple A->B make call example.
 
-- `sendData` - use CiscoTerminal.sendData() to send an [IP Phone Services](https://developer.cisco.com/site/ip-phone-services/) XML display object to a phone
+- `sendData` - use CiscoTerminal.sendData() to send an [IP Phone Services](https://developer.cisco.com/site/ip-phone-services/) XML display object to a phone.
+
+- `superProvider_deviceStateServer` - use CiscoProvider.createTerminal() to dynamically create a terminal by device name using the Cisco JTAPI 'Superprovider' feature.  Then retrieves and monitors the device for device-side status changes using the 'Device State Server' feature.
 
 ## Requirements
 
@@ -32,7 +34,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
     - A [CTI controllable phone device](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (such as a Jabber Windows/Mac client) configured with at least one directory number, associated to the CUCM user
 
-        >Note, ensure at least directory number has `Allow Control of Device from CTI` enabled
+        >Note, ensure at least one directory number has `Allow Control of Device from CTI` enabled
 
     - Ideally a destination phone number for testing (though you could have the phone call its own number)
 
@@ -60,11 +62,9 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
     code .
     ```
 
-1. Edit `.vscode/launch.json` to specify environment variables for the samples to run
+1. Edit `.vscode/launch.json` to specify environment variable config for the samples you wish to run
 
-
-
-    1. Finally, to launch the sample in VS Code, select the **Debug** panel, choose the desired `Debug (Launch) ...` option, and click the green 'Start Debugging' arrow:
+1. Finally, to launch the sample in VS Code, select the **Run** panel, choose the desired `Debug (Launch) ...` option, and click the green 'Start Debugging' arrow:
 
         ![Launch](images/launch.png)
 
@@ -82,12 +82,14 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
         >Note: be sure to update {version} and {/path/to/jtapi.jar} in the command
 
-    - Modify `pom.xml` to specify the new JTAPI version dependency.  Modify `<artifactId>` and `<version>`:
+    - Modify `pom.xml` to specify the new JTAPI version dependency.  Modify `<version>`:
 
         ```xml
         <dependency>
-            <groupId>com.cisco</groupId>
-            <artifactId>jtapi-11.5</artifactId>
+            <groupId>com.cisco.jtapi</groupId>
+            <artifactId>jtapi</artifactId>
             <version>11.5</version>
         </dependency>
         ```
+
+1. JTAPI configuration - e.g. trace log number/size/location and various timeouts - can be configured in `jtapi_config/jtapi.ini` (defined as a resource in `pom.xml`)
