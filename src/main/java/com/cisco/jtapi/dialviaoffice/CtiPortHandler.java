@@ -1,6 +1,6 @@
-package com.cisco.jtapi.makecall;
+package com.cisco.jtapi.dialviaoffice;
 
-// Copyright (c) 2020 Cisco and/or its affiliates.
+// Copyright (c) 2019 Cisco and/or its affiliates.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,35 +20,27 @@ package com.cisco.jtapi.makecall;
 import javax.telephony.*;
 import javax.telephony.events.*;
 import javax.telephony.callcontrol.*;
+import javax.telephony.callcontrol.events.CallCtlTermConnRingingEv;
+import javax.telephony.callcontrol.events.CallCtlTermConnTalkingEv;
+
 import com.cisco.jtapi.extensions.*;
+
 import com.cisco.cti.util.Condition;
 
-public class Handler implements
+public class CtiPortHandler implements TerminalObserver, AddressObserver, CallControlCallObserver {
 
-        ProviderObserver, TerminalObserver, AddressObserver, CallControlCallObserver {
-
-    public Condition providerInService = new Condition();
-    public Condition fromTerminalInService = new Condition();
-    public Condition fromAddressInService = new Condition();
-    public Condition callActive = new Condition();
-
-    public void providerChangedEvent(ProvEv[] events) {
-        for (ProvEv ev : events) {
-            System.out.println("    Received--> Provider/" + ev);
-            switch (ev.getID()) {
-                case ProvInServiceEv.ID:
-                    providerInService.set();
-                    break;
-            }
-        }
-    }
+    public Condition ctipAddressInService = new Condition();
+    public Condition ctipTerminalInService = new Condition();
+    public Condition ctipCallRinging = new Condition();
+    public Condition ctipCallTalking = new Condition();
+    public Condition ctipTransferCompleted = new Condition();
 
     public void terminalChangedEvent(TermEv[] events) {
         for (TermEv ev : events) {
             System.out.println("    Received--> Terminal/"+ev);
             switch (ev.getID()) {
                 case CiscoTermInServiceEv.ID:
-                    fromTerminalInService.set();
+                    ctipTerminalInService.set();
                     break;
             }
         }
@@ -59,7 +51,7 @@ public class Handler implements
             System.out.println("    Received--> Address/"+ev);
             switch (ev.getID()) {
                 case CiscoAddrInServiceEv.ID:
-                    fromAddressInService.set();
+                    ctipAddressInService.set();
                     break;
             }
         }
@@ -69,11 +61,18 @@ public class Handler implements
         for (CallEv ev : events) {
             System.out.println("    Received--> Call/"+ev);
             switch (ev.getID()) {
-                case CallActiveEv.ID:
-                    callActive.set();
+                case CallCtlTermConnRingingEv.ID:
+                    dialViaOffice.ctipInboundCallEvent = (CallCtlTermConnRingingEv) ev;
+                    ctipCallRinging.set();
+                    break;
+                case CallCtlTermConnTalkingEv.ID:
+                    ctipCallTalking.set();
+                    break;
+                case CiscoTransferEndEv.ID:
+                    ctipTransferCompleted.set();
                     break;
             }
         }
-
     }
+
 }

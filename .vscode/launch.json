@@ -9,55 +9,28 @@
             "name": "Launch makeCall",
             "request": "launch",
             "mainClass": "com.cisco.jtapi.makecall.makeCall",
-            "projectName": "jtapi-samples",
-            "env": {
-                "CUCM": "ds-ucm115-1.cisco.com",
-                "USER_NAME": "jtapiuser",
-                "PASSWORD": "password",
-                "CALLING_LINE": "2999",
-                "CALL_TO": "2999"
-            }
+            "projectName": "jtapi-samples"
         },
         {
             "type": "java",
             "name": "Launch sendData",
             "request": "launch",
-            "mainClass": "com.cisco.jtapi.senddata.sendData",
-            "projectName": "jtapi-samples",
-            "env": {
-                "CUCM": "ds-ucm115-1.cisco.com",
-                "USER_NAME": "jtapiuser",
-                "PASSWORD": "password",
-                "LINE": "43121"
-            }
-        },
-        {
-            "type": "java",
-            "name": "Launch consultTransfer",
-            "request": "launch",
-            "mainClass": "com.cisco.jtapi.consultTransfer.consultTransfer",
-            "projectName": "jtapi-samples",
-            "env": {
-                "CUCM": "ds-ucm115-1.cisco.com",
-                "USER_NAME": "jtapiuser",
-                "PASSWORD": "password",
-                "TRANSFER_DEVICE_NAME": "SEP092834092849",
-                "TRANSFER_DN": "43120",
-                "TARGET": "1000"
-            }
+            "mainClass": "com.cisco.jtapi.sendData.sendData",
+            "projectName": "jtapi-samples"
         },
         {
             "type": "java",
             "name": "Launch superProvider_deviceStateServer",
             "request": "launch",
             "mainClass": "com.cisco.jtapi.superProvider_deviceStateServer.superProvider_deviceStateServer",
-            "projectName": "jtapi-samples",
-            "env": {
-                "CUCM": "ds-ucm115-1.cisco.com",
-                "USER_NAME": "jtapiuser",
-                "PASSWORD": "password",
-                "MONITOR_DEVICE_NAME": "IPCMRAEU5UCM5X7"
-            }
-        }   
+            "projectName": "jtapi-samples"
+        },
+        {
+            "type": "java",
+            "name": "Launch dialViaOffice",
+            "request": "launch",
+            "mainClass": "com.cisco.jtapi.dialviaoffice.dialViaOffice",
+            "projectName": "jtapi-samples"
+        }  
     ]
 }

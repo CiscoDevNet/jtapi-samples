@@ -8,17 +8,19 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Available samples
 
-- `makeCall` - simple A->B make call example.
+- `makeCall` - basic make-call example.
 
-- `sendData` - use CiscoTerminal.sendData() to send an [IP Phone Services](https://developer.cisco.com/site/ip-phone-services/) XML display object to a phone.
+- `sendData` - Opens a phone and performs a CiscoTerminal.sendData() request to send an [IP Phone Services](https://developer.cisco.com/site/ip-phone-services/) 'Hello World' message to the phone's display.
 
-- `superProvider_deviceStateServer` - use CiscoProvider.createTerminal() to dynamically create a terminal by device name using the Cisco JTAPI 'Superprovider' feature.  Then retrieves and monitors the device for device-side status changes using the 'Device State Server' feature.
+- `superProvider_deviceStateServer` - Demonstrates using CiscoProvider.createTerminal() to dynamically create a terminal by device name using the 'Superprovider' feature, then retrieves and monitors the device for device-side status changes using the 'Device State Server' feature.
+
+- `dialViaOffice` - Implements a 'dial via office' senario, where a phone calls a CTI Route Point, which makes a new outbound call to a target DN, and then redirects both calls to a CTI Port which transfers the two calls together.
 
 ## Requirements
 
-- [Oracle Java](https://www.oracle.com/technetwork/java/javase/downloads/index.html) 1.8
+- [OpenJDK](https://openjdk.java.net/) 11
 
-- [Apache Maven](https://maven.apache.org/) 3.6.0
+- [Apache Maven](https://maven.apache.org/) 3.6.3
 
 - [Visual Studio Code](https://code.visualstudio.com/)
 
@@ -32,24 +34,29 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
         - `Standard CTI Enabled`
 
-    - A [CTI controllable phone device](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (such as a Jabber Windows/Mac client) configured with at least one directory number, associated to the CUCM user
+        - `Standard CTI Allow Control of all Devices`
+
+    - One (or two, to try all sample scenarios) [CTI suported phone devices](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (includes Cisco IP Communicator and Jabber soft phones), each configured with at least one directory number, each associated to the CUCM user.
 
         >Note, ensure at least one directory number has `Allow Control of Device from CTI` enabled
 
-    - Ideally a destination phone number for testing (though you could have the phone call its own number)
-
 ## Getting started
 
-1. Make sure you have Oracle Java SE 1.8 installed, and `java` is available in the path
+1. Make sure you have OpenJDK 11 installed, `java` is available in the path, and `$JAVA_HOME` points to the right directory:
 
     ```bash
     $ java -version
-    java version "1.8.0_201"
-    Java(TM) SE Runtime Environment (build 1.8.0_201-b09)
-    Java HotSpot(TM) 64-Bit Server VM (build 25.201-b09, mixed mode)
+    openjdk 11.0.8 2020-07-14
+    OpenJDK Runtime Environment (build 11.0.8+10-post-Ubuntu-0ubuntu120.04)
+    OpenJDK 64-Bit Server VM (build 11.0.8+10-post-Ubuntu-0ubuntu120.04, mixed mode, sharing)
     ```
 
-1. Open a terminal window and use `git` to clone this repository:
+    ```bash
+    $ echo $JAVA_HOME
+    /usr/lib/jvm/java-1.11.0-openjdk-amd64
+    ```
+
+1. Open a terminal and use `git` to clone this repository:
 
     ```bash
     git clone https://github.com/CiscoDevNet/jtapi-samples.git
@@ -62,11 +69,11 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
     code .
     ```
 
-1. Edit `.vscode/launch.json` to specify environment variable config for the samples you wish to run
+1. Edit rename `.env.example` to `.env`, and edit to specify environment variable config for the samples you wish to run.
 
-1. Finally, to launch the sample in VS Code, select the **Run** panel, choose the desired `Debug (Launch) ...` option, and click the green 'Start Debugging' arrow:
+1. Finally, to launch the sample in VS Code, select the **Run** panel, choose the desired `Launch...` option from the drop-down in the upper left, and click the green 'Start Debugging' arrow (or hit **F5**)
 
-        ![Launch](images/launch.png)
+    ![Launch](images/launch.png)
 
 ## Notes
 

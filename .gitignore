@@ -26,5 +26,9 @@ buildNumber.properties
 .project
 .vscode/settings.json
 
-# JTAPI log files
-CiscoJtapi*
+# JTAPI files
+jtapi_logs/CiscoJtapi*
+lib/com/cisco/jtapi/jtapi/*
+!lib/com/cisco/jtapi/jtapi/12.5
+
+.env

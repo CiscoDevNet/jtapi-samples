@@ -1,4 +1,4 @@
-package com.cisco.jtapi.superProvider_deviceStateServer;
+package com.cisco.jtapi.sendData;
 
 // Copyright (c) 2020 Cisco and/or its affiliates.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,15 +19,18 @@ package com.cisco.jtapi.superProvider_deviceStateServer;
 
 import javax.telephony.*;
 import javax.telephony.events.*;
+import javax.telephony.callcontrol.*;
 import com.cisco.jtapi.extensions.*;
 import com.cisco.cti.util.Condition;
 
 public class Handler implements
 
-        ProviderObserver, TerminalObserver {
+        ProviderObserver, TerminalObserver, AddressObserver, CallControlCallObserver {
 
     public Condition providerInService = new Condition();
-    public Condition phoneTerminalInService = new Condition();
+    public Condition fromTerminalInService = new Condition();
+    public Condition phoneAddressInService = new Condition();
+    public Condition callActive = new Condition();
 
     public void providerChangedEvent(ProvEv[] events) {
         for (ProvEv ev : events) {
@@ -45,24 +48,32 @@ public class Handler implements
             System.out.println("    Received--> Terminal/"+ev);
             switch (ev.getID()) {
                 case CiscoTermInServiceEv.ID:
-                    phoneTerminalInService.set();
+                    fromTerminalInService.set();
                     break;
-                case CiscoTermDeviceStateIdleEv.ID:
-                    System.out.println("    DEVICE STATE--> "+superProvider_deviceStateServer.stateName.get(CiscoTerminal.DEVICESTATE_IDLE));
-                    break;
-                case CiscoTermDeviceStateActiveEv.ID:
-                    System.out.println("    DEVICE STATE--> "+superProvider_deviceStateServer.stateName.get(CiscoTerminal.DEVICESTATE_ACTIVE));
-                    break;
-                case CiscoTermDeviceStateAlertingEv.ID:
-                    System.out.println("    DEVICE STATE--> "+superProvider_deviceStateServer.stateName.get(CiscoTerminal.DEVICESTATE_ALERTING));
-                    break;
-                case CiscoTermDeviceStateHeldEv.ID:
-                    System.out.println("    DEVICE STATE--> "+superProvider_deviceStateServer.stateName.get(CiscoTerminal.DEVICESTATE_HELD));
-                    break;
-                case CiscoTermDeviceStateWhisperEv.ID:
-                    System.out.println("    DEVICE STATE--> "+superProvider_deviceStateServer.stateName.get(CiscoTerminal.DEVICESTATE_WHISPER));
-                    break;            }
+            }
         }
     }
 
+    public void addressChangedEvent(AddrEv[] events) {
+        for (AddrEv ev : events) {
+            System.out.println("    Received--> Address/"+ev);
+            switch (ev.getID()) {
+                case CiscoAddrInServiceEv.ID:
+                    phoneAddressInService.set();
+                    break;
+            }
+        }
+    }
+
+    public void callChangedEvent(CallEv[] events) {
+        for (CallEv ev : events) {
+            System.out.println("    Received--> Call/"+ev);
+            switch (ev.getID()) {
+                case CallActiveEv.ID:
+                    callActive.set();
+                    break;
+            }
+        }
+
+    }
 }
