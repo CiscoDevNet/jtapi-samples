@@ -77,7 +77,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Notes
 
-1. In this project, the 11.5 version of the JTAPI Java libraries have been deployed to the local Maven repo in `lib/`.  If  you want to use a different version in the project:
+1. In this project, the 12.5 version of the JTAPI Java libraries have been deployed to the local Maven repo in `lib/`.  If  you want to use a different version in the project:
 
     - Download and install the JTAPI plugin from CUCM (**Applications** / **Plugins**)
 
@@ -95,7 +95,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
         <dependency>
             <groupId>com.cisco.jtapi</groupId>
             <artifactId>jtapi</artifactId>
-            <version>11.5</version>
+            <version>12.5</version>
         </dependency>
         ```
 
