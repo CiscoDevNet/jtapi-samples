@@ -18,6 +18,9 @@ buildNumber.properties
 .idea/*
 !.idea/runConfigurations/
 
+# Mac OS
+.DS_Store
+
 #
 # Visual Studio Code
 #

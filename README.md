@@ -77,26 +77,30 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Notes
 
-1. In this project, the 12.5 version of the JTAPI Java libraries have been deployed to the local Maven repo in `lib/`.  If  you want to use a different version in the project:
+1. In this project, the 11.5 and 12.5 versions of the JTAPI Java library have been deployed to the project's local Maven repo (in `lib/`), with 12.5 being the configured version. 
 
-    - Download and install the JTAPI plugin from CUCM (**Applications** / **Plugins**)
+    If you want to use 11.5 (or you deploy another version, as below), modify `pom.xml` to specify the desired JTAPI version dependency.  Modify `<version>`:
 
-    - From this repository's root, use Maven to deploy the new version of `jtapi.jar` to the local repo.  You will need to identify the full path to the `jtapi.jar` installed above:
+    ```xml
+    <dependency>
+        <groupId>com.cisco.jtapi</groupId>
+        <artifactId>jtapi</artifactId>
+        <version>12.5</version>
+    </dependency>
+    ```
+
+1.  If  you want to use another JTAPI version in the project:
+
+    * Download and install/extract the JTAPI plugin from CUCM (**Applications** / **Plugins**)
+
+    * From this repository's root, use Maven to deploy the new version of `jtapi.jar` to the local repo.  You will need to identify the full path to the new `jtapi.jar` installed above:
 
         ```bash
         mvn deploy:deploy-file -DgroupId=com.cisco.jtapi -DartifactId=jtapi -Dversion={version} -Durl=file:./lib -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile={/path/to/jtapi.jar}
         ```
 
-        >Note: be sure to update {version} and {/path/to/jtapi.jar} in the command
-
-    - Modify `pom.xml` to specify the new JTAPI version dependency.  Modify `<version>`:
-
-        ```xml
-        <dependency>
-            <groupId>com.cisco.jtapi</groupId>
-            <artifactId>jtapi</artifactId>
-            <version>12.5</version>
-        </dependency>
-        ```
+        >Note: be sure to update {version} and {/path/to/jtapi.jar} to your actual values
 
 1. JTAPI configuration - e.g. trace log number/size/location and various timeouts - can be configured in `jtapi_config/jtapi.ini` (defined as a resource in `pom.xml`)
+
+1. As of v12.5, the Cisco `jtapi.jar` does not implement the [Java Platform Module System](https://www.oracle.com/corporate/features/understanding-java-9-modules.html) (JPMS).  See this [issue](https://github.com/CiscoDevNet/jtapi-samples/issues/1) for more info.
