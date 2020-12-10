@@ -16,6 +16,8 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 - `dialViaOffice` - Implements a 'dial via office' senario, where a phone calls a CTI Route Point, which makes a new outbound call to a target DN, and then redirects both calls to a CTI Port which transfers the two calls together.
 
+- 'conference - Implements a 3-way ad hoc conference scenario
+
 ## Requirements
 
 - [OpenJDK](https://openjdk.java.net/) 11
@@ -36,9 +38,9 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
         - `Standard CTI Allow Control of all Devices`
 
-    - One (or two, to try all sample scenarios) [CTI suported phone devices](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (includes Cisco IP Communicator and Jabber soft phones), each configured with at least one directory number, each associated to the CUCM user.
+    - One (or three, to try all sample scenarios) [CTI suported phone devices](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (includes Cisco IP Communicator and Jabber soft phones), each configured with one directory number, each associated to the CUCM user.
 
-        >Note, ensure at least one directory number has `Allow Control of Device from CTI` enabled
+        >Note, ensure directory numbers have `Allow Control of Device from CTI` enabled
 
 ## Getting started
 
@@ -46,9 +48,9 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
     ```bash
     $ java -version
-    openjdk 11.0.8 2020-07-14
-    OpenJDK Runtime Environment (build 11.0.8+10-post-Ubuntu-0ubuntu120.04)
-    OpenJDK 64-Bit Server VM (build 11.0.8+10-post-Ubuntu-0ubuntu120.04, mixed mode, sharing)
+    openjdk 11.0.9.1 2020-11-04
+    OpenJDK Runtime Environment (build 11.0.9.1+1-Ubuntu-0ubuntu1.20.10)
+    OpenJDK 64-Bit Server VM (build 11.0.9.1+1-Ubuntu-0ubuntu1.20.10, mixed mode, sharing)
     ```
 
     ```bash

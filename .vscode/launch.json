@@ -31,6 +31,13 @@
             "request": "launch",
             "mainClass": "com.cisco.jtapi.dialviaoffice.dialViaOffice",
             "projectName": "jtapi-samples"
+        },
+        {
+            "type": "java",
+            "name": "Launch conference",
+            "request": "launch",
+            "mainClass": "com.cisco.jtapi.conference.conference",
+            "projectName": "jtapi-samples"
         }  
     ]
 }
