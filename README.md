@@ -20,11 +20,11 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Requirements
 
-- [OpenJDK](https://openjdk.java.net/) 11
+- [OpenJDK 8](https://openjdk.java.net/)
 
 - [Apache Maven](https://maven.apache.org/) 3.6.3
 
-- [Visual Studio Code](https://code.visualstudio.com/)
+- [Visual Studio Code](https://code.visualstudio.com/) with the [MS Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
 
 - A working Cisco Unified Communications Manager environment:
 
@@ -38,9 +38,15 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
         - `Standard CTI Allow Control of all Devices`
 
-    - One (or three, to try all sample scenarios) [CTI suported phone devices](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (includes Cisco IP Communicator and Jabber soft phones), each configured with one directory number, each associated to the CUCM user.
+    - One (or three, to try all sample scenarios) [CTI supported phone devices](https://developer.cisco.com/site/jtapi/documents/cti-tapi-jtapi-supported-device-matrix/) (includes Cisco IP Communicator and Jabber soft phones), each configured with one directory number, each associated to the CUCM user.
 
         >Note, ensure directory numbers have `Allow Control of Device from CTI` enabled
+
+**Tested With:**
+
+* Ubuntu 22.04
+* OpenJDK 8/11
+* Maven 3.6.3
 
 ## Getting started
 
@@ -79,9 +85,9 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Notes
 
-1. In this project, the 11.5 and 12.5 versions of the JTAPI Java library have been deployed to the project's local Maven repo (in `lib/`), with 12.5 being the configured version. 
+1. In this project, the 11.5, 12.5 and 14 versions of the JTAPI Java library have been deployed to the project's local Maven repo (in `lib/`), with 14 being the configured version. 
 
-    If you want to use 11.5 (or you deploy another version, as below), modify `pom.xml` to specify the desired JTAPI version dependency.  Modify `<version>`:
+    If you want to use another deployed version, modify `pom.xml` to specify the desired JTAPI version dependency.  Modify `<version>`:
 
     ```xml
     <dependency>
@@ -91,7 +97,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
     </dependency>
     ```
 
-1.  If  you want to use another JTAPI version in the project:
+1.  If  you want to deploy another JTAPI version in the project:
 
     * Download and install/extract the JTAPI plugin from CUCM (**Applications** / **Plugins**)
 
@@ -101,8 +107,8 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
         mvn deploy:deploy-file -DgroupId=com.cisco.jtapi -DartifactId=jtapi -Dversion={version} -Durl=file:./lib -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile={/path/to/jtapi.jar}
         ```
 
-        >Note: be sure to update {version} and {/path/to/jtapi.jar} to your actual values
+        >Note: be sure to update {version} and {/path/to/jtapi.jar} with your actual values
 
 1. JTAPI configuration - e.g. trace log number/size/location and various timeouts - can be configured in `jtapi_config/jtapi.ini` (defined as a resource in `pom.xml`)
 
-1. As of v12.5, the Cisco `jtapi.jar` does not implement the [Java Platform Module System](https://www.oracle.com/corporate/features/understanding-java-9-modules.html) (JPMS).  See this [issue](https://github.com/CiscoDevNet/jtapi-samples/issues/1) for more info.
+1. As of v14, the Cisco `jtapi.jar` does not implement the [Java Platform Module System](https://www.oracle.com/corporate/features/understanding-java-9-modules.html) (JPMS).  See this [issue](https://github.com/CiscoDevNet/jtapi-samples/issues/1) for more info.
