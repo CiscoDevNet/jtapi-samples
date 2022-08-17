@@ -55,14 +55,14 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
     ```bash
     $ java -version
-    openjdk 11.0.9.1 2020-11-04
-    OpenJDK Runtime Environment (build 11.0.9.1+1-Ubuntu-0ubuntu1.20.10)
-    OpenJDK 64-Bit Server VM (build 11.0.9.1+1-Ubuntu-0ubuntu1.20.10, mixed mode, sharing)
+    openjdk version "1.8.0_342"
+    OpenJDK Runtime Environment (build 1.8.0_342-8u342-b07-0ubuntu1~22.04-b07)
+    OpenJDK 64-Bit Server VM (build 25.342-b07, mixed mode)
     ```
 
     ```bash
     $ echo $JAVA_HOME
-    /usr/lib/jvm/java-1.11.0-openjdk-amd64
+    /usr/lib/jvm/java-8-openjdk-amd64
     ```
 
 1. Open a terminal and use `git` to clone this repository:
@@ -77,6 +77,23 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
     cd jtapi-samples
     code .
     ```
+
+1. Configure the Java runtime for the project (see [Configure Java Runtime](https://code.visualstudio.com/docs/java/java-project#_configure-runtime-for-projects)):
+
+   Open (or create) `.vscode/settings.json`
+
+   **Sample configuration**
+
+   ```json
+   {
+       "java.configuration.runtimes": [
+           {
+               "name": "JavaSE-1.8",
+               "path": "/usr/lib/jvm/java-8-openjdk-amd64"
+           }
+       ]
+   }   
+   ```
 
 1. Edit rename `.env.example` to `.env`, and edit to specify environment variable config for the samples you wish to run.
 
