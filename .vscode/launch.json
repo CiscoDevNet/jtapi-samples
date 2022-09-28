@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch playMedia",
+            "request": "launch",
+            "mainClass": "com.cisco.jtapi.playmedia.playMedia",
+            "projectName": "jtapi-samples"
+        },
+        {
+            "type": "java",
+            "name": "Launch test",
+            "request": "launch",
+            "mainClass": "com.cisco.jtapi.playmedia.test",
+            "projectName": "jtapi-samples"
+        },
+        {
+            "type": "java",
             "name": "Launch makeCall",
             "request": "launch",
             "mainClass": "com.cisco.jtapi.makecall.makeCall",
@@ -38,6 +52,6 @@
             "request": "launch",
             "mainClass": "com.cisco.jtapi.conference.conference",
             "projectName": "jtapi-samples"
-        }  
+        }
     ]
 }

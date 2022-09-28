@@ -16,7 +16,9 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 - `dialViaOffice` - Implements a 'dial via office' senario, where a phone calls a CTI Route Point, which makes a new outbound call to a target DN, and then redirects both calls to a CTI Port which transfers the two calls together.
 
-- `conference` - Implements a 3-way ad hoc conference scenario
+- `conference` - Implements a 3-way ad hoc conference scenario.
+
+- `playmedia` - Answer an inbound call on a CTI Port, then play an audio file using the [gstreamer-java](https://github.com/gstreamer-java/gst1-java-core) framework (see [GStreamer Downloads](https://gstreamer.freedesktop.org/download/) to install - present by default in Ubuntu Linux.)
 
 ## Requirements
 
