@@ -35,11 +35,11 @@ public class Handler implements ProviderObserver, TerminalObserver, AddressObser
     public Condition providerInService = new Condition();
     public Condition rpTerminalInService = new Condition();
     public Condition rpAddressInService = new Condition();
-    public Condition rpDialinCallRinging = new Condition();
-    public Condition dialoutCallEstablished = new Condition();
-    public Condition rpDialinCallTalking = new Condition();
-    public Condition rpDialinCallHeld = new Condition();
-    public Condition rpOpenLogicalChannel = new Condition();
+    public Condition rpDialinCallRinging;
+    public Condition dialoutCallEstablished;
+    public Condition rpDialinCallTalking;
+    public Condition rpDialinCallHeld;
+    public Condition rpOpenLogicalChannel;
 
     public void providerChangedEvent(ProvEv[] events) {
         for (ProvEv ev : events) {

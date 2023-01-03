@@ -120,7 +120,7 @@ public class dialViaOffice {
         log("Opening/registering CTI Route Point DN: " + dotenv.get("CTI_ROUTE_POINT_DN"));
         rpAddress = (CiscoAddress) (provider.getAddress(dotenv.get("CTI_ROUTE_POINT_DN")));
         rpAddress.addObserver(handler);
-        
+
         CiscoRouteTerminal rpTerminal = (CiscoRouteTerminal) rpAddress.getTerminals()[0];
         rpTerminal.addObserver(handler);
         rpTerminal.register(new CiscoMediaCapability[] { CiscoMediaCapability.G711_64K_30_MILLISECONDS },
@@ -152,96 +152,113 @@ public class dialViaOffice {
         // Add a call observer to receive call events
         ctipAddress.addCallObserver(ctipHandler);
 
-        // Wait for an inbound call on the CTI Route Point
-        log("Ready for dialin call at CTI Route Point DN: " + rpAddress.getName());
-        log("Awaiting dialin CallCtlTermConnRingingEv for: " + rpTerminal.getName() + "...");
-        handler.rpDialinCallRinging.waitTrue();
+        while (true) {
+            log("Ready for dialin call at CTI Route Point DN: " + rpAddress.getName());
 
-        // Via the newly populated rpInboundCallEvent (see handler), drill/cast down to
-        // a
-        // CallControlTerminalConnection so we can do some operations
-        CallControlTerminalConnection rpIncomingCctConnection = (CallControlTerminalConnection) rpDialinCallEvent
-                .getTerminalConnection();
+            // Wait for an inbound call on the CTI Route Point
+            handler.rpDialinCallRinging = new Condition();
+            log("Awaiting dialin CallCtlTermConnRingingEv for: " + rpTerminal.getName() + "...");
+            handler.rpDialinCallRinging.waitTrue();
 
-        // Answer the dialin call on the CTI Route Point
-        log("Answering dialin call from DN: " + rpDialinCallEvent.getCallingAddress().getName());
-        rpIncomingCctConnection.answer();
-        // Wait for the OLC event and provide dynamic RTP media details
-        log("Awaiting dialin CiscoMediaOpenLogicalChannelEv for: " + rpIncomingCctConnection.getTerminal().getName());
-        handler.rpOpenLogicalChannel.waitTrue();
-        ((CiscoRouteTerminal) rpOpenLogicalChannelEvent.getTerminal()).setRTPParams(
-                rpOpenLogicalChannelEvent.getCiscoRTPHandle(), new CiscoRTPParams(rpRtpAddress, rpRtpPort));
+            // Via the newly populated rpInboundCallEvent (see handler), drill/cast down to
+            // a
+            // CallControlTerminalConnection so we can do some operations
+            CallControlTerminalConnection rpIncomingCctConnection = (CallControlTerminalConnection) rpDialinCallEvent
+                    .getTerminalConnection();
 
-        log("Awaiting dialin CallCtlTermConnTalkingEv for: " + rpIncomingCctConnection.getTerminal().getName() + "...");
-        handler.rpDialinCallTalking.waitTrue();
-        log("Holding dialin call on: " + rpIncomingCctConnection.getConnection().getAddress().getName());
-        rpIncomingCctConnection.hold();
-        log("Awaiting dialin CallCtlTermConnHeldEv for: " + rpIncomingCctConnection.getTerminal().getName() + "...");
-        handler.rpDialinCallHeld.waitTrue();
+            // Answer the dialin call on the CTI Route Point
+            log("Answering dialin call from DN: " + rpDialinCallEvent.getCallingAddress().getName());
+            handler.rpOpenLogicalChannel = new Condition();
+            handler.rpDialinCallTalking = new Condition();
+            rpIncomingCctConnection.answer();
 
-        // Create a new outbound call for the dialout leg
-        log("Making dialout call to DN: " + dotenv.get("BOB_DN"));
-        Call dialoutCall = provider.createCall();
-        Connection[] dialoutConnections = dialoutCall.connect(rpTerminal, rpAddress, dotenv.get("BOB_DN"));
-        if (dialoutConnections[0].getAddress().getName().equals(dotenv.get("BOB_DN"))) {
-            dialoutAddress = (CiscoAddress) dialoutConnections[0].getAddress();
-        } else {
-            dialoutAddress = (CiscoAddress) dialoutConnections[1].getAddress();
+            // Wait for the OLC event and provide dynamic RTP media details
+            log("Awaiting dialin CiscoMediaOpenLogicalChannelEv for: "
+                    + rpIncomingCctConnection.getTerminal().getName());
+            handler.rpOpenLogicalChannel.waitTrue();
+            ((CiscoRouteTerminal) rpOpenLogicalChannelEvent.getTerminal()).setRTPParams(
+                    rpOpenLogicalChannelEvent.getCiscoRTPHandle(), new CiscoRTPParams(rpRtpAddress, rpRtpPort));
+
+            // Wait for the dialin call to receive talking event
+            log("Awaiting dialin CallCtlTermConnTalkingEv for: " + rpIncomingCctConnection.getTerminal().getName()+ "...");
+            handler.rpDialinCallTalking.waitTrue();
+
+            // Hold the dialin call
+            log("Holding dialin call on: " + rpIncomingCctConnection.getConnection().getAddress().getName());
+            handler.rpDialinCallHeld = new Condition();
+            rpIncomingCctConnection.hold();
+            log("Awaiting dialin CallCtlTermConnHeldEv for: " + rpIncomingCctConnection.getTerminal().getName()
+                    + "...");
+            handler.rpDialinCallHeld.waitTrue();
+
+            // Create a new outbound call for the dialout leg
+            log("Making dialout call to DN: " + dotenv.get("BOB_DN"));
+            handler.dialoutCallEstablished = new Condition();
+            Call dialoutCall = provider.createCall();
+            Connection[] dialoutConnections = dialoutCall.connect(rpTerminal, rpAddress, dotenv.get("BOB_DN"));
+            if (dialoutConnections[0].getAddress().getName().equals(dotenv.get("BOB_DN"))) {
+                dialoutAddress = (CiscoAddress) dialoutConnections[0].getAddress();
+            } else {
+                dialoutAddress = (CiscoAddress) dialoutConnections[1].getAddress();
+            }
+
+            // Wait for the dialout call to be answered
+            log("Awaiting dialout CallCtlConnEstablishedEv for DN: " + dialoutAddress.getName() + "...");
+            handler.dialoutCallEstablished.waitTrue();
+
+            log("Redirecting dialin call to CTI Port DN: " + ctipAddress.getName());
+            ctipHandler.ctipCallRinging = new Condition();
+            ((CallControlConnection) rpIncomingCctConnection.getConnection()).redirect(ctipAddress.getName());
+            log("Awaiting CTI Port dialin CallCtlTermConnRingingEv for: " + ctipTerminal.getName() + "...");
+            ctipHandler.ctipCallRinging.waitTrue();
+
+            // Via the newly populated ctipInboundCallEvent (see handler), drill/cast down
+            // to a
+            // CallControlTerminalConnection so we can do some operations
+            CallControlTerminalConnection ctipIncomingCctConnection = (CallControlTerminalConnection) ctipInboundCallEvent
+                    .getTerminalConnection();
+
+            log("Answering CTI Port dialin call from DN: " + ctipInboundCallEvent.getCallingAddress().getName());
+            ctipHandler.ctipCallTalking = new Condition();
+            ctipIncomingCctConnection.answer();
+            log("Awaiting CTI Port dialin CallCtlTermConnTalkingEv for: "
+                    + ctipIncomingCctConnection.getTerminal().getName() + "...");
+            ctipHandler.ctipCallTalking.waitTrue();
+            log("Holding CTI Port dialin call on DN: "
+                    + ctipIncomingCctConnection.getConnection().getAddress().getName());
+            ctipIncomingCctConnection.hold();
+            log("Awaiting CTI Port dialin CallCtlTermConnHeldEv for: "
+                    + ctipIncomingCctConnection.getTerminal().getName()
+                    + "...");
+
+            // Retrieve the Call object for the CTI Port dialin inbound call
+            CallControlCall ctipInboundCallLeg = (CallControlCall) ctipIncomingCctConnection.getConnection().getCall();
+            log("Redirecting dialout call to CTI Port DN: " + ctipAddress.getName());
+            ctipHandler.ctipCallRinging = new Condition();
+            ((CallControlConnection) dialoutConnections[0]).redirect(ctipAddress.getName());
+            log("Awaiting CTI Port dialout CallCtlTermConnRingingEv for: " + ctipTerminal.getName() + "...");
+            ctipHandler.ctipCallRinging.waitTrue();
+
+            // Via the newly populated ctipInboundCallEvent, drill/cast down to a
+            // CallControlTerminalConnection so we can do some operations
+            ctipIncomingCctConnection = (CallControlTerminalConnection) ctipInboundCallEvent.getTerminalConnection();
+
+            log("Answering CTI Port dialout call from DN: " + ctipInboundCallEvent.getCallingAddress().getName());
+            ctipHandler.ctipCallTalking = new Condition();
+            ctipIncomingCctConnection.answer();
+            log("Awaiting CTI Port dialout CallCtlTermConnTalkingEv for: "
+                    + ctipIncomingCctConnection.getTerminal().getName() + "...");
+            ctipHandler.ctipCallTalking.waitTrue();
+
+            // Retrieve the Call object for the CTI Port dialout inbound call
+            CallControlCall ctipOutboundCallLeg = (CallControlCall) ctipIncomingCctConnection.getConnection().getCall();
+
+            log("Transfering dialin call to dialout call");
+            ctipHandler.ctipTransferCompleted = new Condition();
+            ctipInboundCallLeg.transfer(ctipOutboundCallLeg);
+            log("Awaiting CTI Port dialin CiscoTransferEndEv...");
+            ctipHandler.ctipTransferCompleted.waitTrue();
+
         }
-        // Wait for the dialout call to be answered
-        log("Awaiting dialout CallCtlConnEstablishedEv for DN: " + dialoutAddress.getName() + "...");
-        handler.dialoutCallEstablished.waitTrue();
-
-        log("Redirecting dialin call to CTI Port DN: " + ctipAddress.getName());
-        ((CallControlConnection) rpIncomingCctConnection.getConnection()).redirect(ctipAddress.getName());
-        log("Awaiting CTI Port dialin CallCtlTermConnRingingEv for: " + ctipTerminal.getName() + "...");
-        ctipHandler.ctipCallRinging.waitTrue();
-
-        // Via the newly populated ctipInboundCallEvent (see handler), drill/cast down
-        // to a
-        // CallControlTerminalConnection so we can do some operations
-        CallControlTerminalConnection ctipIncomingCctConnection = (CallControlTerminalConnection) ctipInboundCallEvent
-                .getTerminalConnection();
-
-        log("Answering CTI Port dialin call from DN: " + ctipInboundCallEvent.getCallingAddress().getName());
-        ctipIncomingCctConnection.answer();
-        log("Awaiting CTI Port dialin CallCtlTermConnTalkingEv for: "
-                + ctipIncomingCctConnection.getTerminal().getName() + "...");
-        ctipHandler.ctipCallTalking.waitTrue();
-        log("Holding CTI Port dialin call on DN: " + ctipIncomingCctConnection.getConnection().getAddress().getName());
-        ctipIncomingCctConnection.hold();
-        log("Awaiting CTI Port dialin CallCtlTermConnHeldEv for: " + ctipIncomingCctConnection.getTerminal().getName()
-                + "...");
-
-        // Retrieve the Call object for the CTI Port dialin inbound call
-        CallControlCall ctipInboundCallLeg = (CallControlCall) ctipIncomingCctConnection.getConnection().getCall();
-        log("Redirecting dialout call to CTI Port DN: " + ctipAddress.getName());
-        ((CallControlConnection) dialoutConnections[0]).redirect(ctipAddress.getName());
-        log("Awaiting CTI Port dialout CallCtlTermConnRingingEv for: " + ctipTerminal.getName() + "...");
-        ctipHandler.ctipCallRinging = new Condition();
-        ctipHandler.ctipCallRinging.waitTrue();
-
-        // Via the newly populated ctipInboundCallEvent, drill/cast down to a
-        // CallControlTerminalConnection so we can do some operations
-        ctipIncomingCctConnection = (CallControlTerminalConnection) ctipInboundCallEvent.getTerminalConnection();
-
-        log("Answering CTI Port dialout call from DN: " + ctipInboundCallEvent.getCallingAddress().getName());
-        ctipIncomingCctConnection.answer();
-        log("Awaiting CTI Port dialout CallCtlTermConnTalkingEv for: "
-                + ctipIncomingCctConnection.getTerminal().getName() + "...");
-        ctipHandler.ctipCallTalking = new Condition();
-        ctipHandler.ctipCallTalking.waitTrue();
-
-        // Retrieve the Call object for the CTI Port dialout inbound call
-        CallControlCall ctipOutboundCallLeg = (CallControlCall) ctipIncomingCctConnection.getConnection().getCall();
-
-        log("Transfering dialin call to dialout call");
-        ctipInboundCallLeg.transfer(ctipOutboundCallLeg);
-        log("Awaiting CTI Port dialin CiscoTransferEndEv...");
-        ctipHandler.ctipTransferCompleted.waitTrue();
-
-        log("Done.");
-        System.exit(0);
     }
-
 }

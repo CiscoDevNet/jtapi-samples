@@ -31,9 +31,9 @@ public class CtiPortHandler implements TerminalObserver, AddressObserver, CallCo
 
     public Condition ctipAddressInService = new Condition();
     public Condition ctipTerminalInService = new Condition();
-    public Condition ctipCallRinging = new Condition();
-    public Condition ctipCallTalking = new Condition();
-    public Condition ctipTransferCompleted = new Condition();
+    public Condition ctipCallRinging;
+    public Condition ctipCallTalking;
+    public Condition ctipTransferCompleted;
 
     public void terminalChangedEvent(TermEv[] events) {
         for (TermEv ev : events) {
