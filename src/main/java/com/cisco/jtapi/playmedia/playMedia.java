@@ -44,8 +44,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import java.time.format.DateTimeFormatter;  
-import java.time.LocalDateTime;  
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 import javax.telephony.*;
 import javax.telephony.callcontrol.*;
@@ -67,8 +67,9 @@ public class playMedia {
     public static CiscoRTPOutputStartedEv ctipRTPOutputStartedEvent;
     private static Pipeline pipeline;
     private static Bus bus;
-    
-    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss.SS"); 
+
+    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss.SS");
+
     private static void log(String msg) {
         System.out.println(dtf.format(LocalDateTime.now()) + " " + msg);
     }
@@ -76,10 +77,11 @@ public class playMedia {
     public static void main(String[] args) throws
 
     JtapiPeerUnavailableException, ResourceUnavailableException, MethodNotSupportedException, InvalidArgumentException,
-            PrivilegeViolationException, InvalidPartyException, InvalidStateException, InterruptedException, UnknownHostException, SocketException, CiscoRegistrationException {
+            PrivilegeViolationException, InvalidPartyException, InvalidStateException, InterruptedException,
+            UnknownHostException, SocketException, CiscoRegistrationException {
 
         // Retrieve environment variables from .env, if present
-        Dotenv dotenv=Dotenv.load();
+        Dotenv dotenv = Dotenv.load();
 
         // Determine this PC's address and get an ephemeral port number
         // for registering RTP media for the CTI Port
@@ -92,7 +94,8 @@ public class playMedia {
         Utils.configurePaths();
         Gst.init();
 
-        // The Handler class provides observers for provider/address/terminal/call events
+        // The Handler class provides observers for provider/address/terminal/call
+        // events
         CtiPortHandler handler = new CtiPortHandler();
 
         // Create the JtapiPeer object, representing the JTAPI library
@@ -102,12 +105,12 @@ public class playMedia {
         // Create and open the Provider, representing a JTAPI connection to CUCM CTI
         // Manager
         String providerString = String.format(
-            "%s;login=%s;passwd=%s",
-            dotenv.get("CUCM_ADDRESS"),
-            dotenv.get("JTAPI_USERNAME"),
-            dotenv.get("JTAPI_PASSWORD"));
+                "%s;login=%s;passwd=%s",
+                dotenv.get("CUCM_ADDRESS"),
+                dotenv.get("JTAPI_USERNAME"),
+                dotenv.get("JTAPI_PASSWORD"));
         log("Connecting Provider: " + providerString);
-        CiscoProvider provider=(CiscoProvider) peer.getProvider(providerString);
+        CiscoProvider provider = (CiscoProvider) peer.getProvider(providerString);
         log("Awaiting ProvInServiceEv...");
         provider.addObserver(handler);
         handler.providerInService.waitTrue();
@@ -135,7 +138,7 @@ public class playMedia {
         log("Ready for dialin call at CTI Port DN: " + ctipAddress.getName());
         log("Awaiting dialin CallCtlTermConnRingingEv for: " + ctipTerminal.getName() + "...");
         handler.ctipCallRinging.waitTrue();
-        
+
         // Via the newly populated ctipDialinCallEvent (see handler), drill/cast down to
         // a CallControlTerminalConnection so we can do some operations
         CallControlTerminalConnection ctipIncomingCctConnection = (CallControlTerminalConnection) ctipDialinCallEvent
@@ -144,19 +147,24 @@ public class playMedia {
         // Answer the dialin call on the CTI Port
         log("Answering dialin call from DN: " + ctipDialinCallEvent.getCallingAddress().getName());
         ctipIncomingCctConnection.answer();
-        // Wait for the RTP output started event to indicate we can begin streaming audio
+        // Wait for the RTP output started event to indicate we can begin streaming
+        // audio
         log("Awaiting CiscoRTPOutputStartedEv for: " + ctipIncomingCctConnection.getTerminal().getName());
         handler.ctipRTPOutputStarted.waitTrue();
 
         // Extract the caller's IP/port for sending RTP audio media
         String destHost = ctipRTPOutputStartedEvent.getRTPOutputProperties().getRemoteAddress().getHostAddress();
         Integer destPort = ctipRTPOutputStartedEvent.getRTPOutputProperties().getRemotePort();
-        // Create the GStreamer pipeline string to send audio from a file to the caller's phone; 30ms RTP packet size (in nanoseconds!)
-        String pipelineDescription = String.format("filesrc location=media/g711.wav ! wavparse ! mulawenc ! rtppcmupay max-ptime=30000000 ! udpsink host=%s port=%s", destHost, destPort);
+        // Create the GStreamer pipeline string to send audio from a file to the
+        // caller's phone; 30ms RTP packet size (in nanoseconds!)
+        String pipelineDescription = String.format(
+                "filesrc location=media/g711.wav ! wavparse ! mulawenc ! rtppcmupay max-ptime=30000000 ! udpsink host=%s port=%s",
+                destHost, destPort);
         // Instantiate the GStreamer pipline from the string
         pipeline = (Pipeline) Gst.parseLaunch(pipelineDescription);
-        
-        // Add a GStreamer message bus event listener, triggered when the file is finished playing
+
+        // Add a GStreamer message bus event listener, triggered when the file is
+        // finished playing
         bus = (Bus) pipeline.getBus();
         bus.connect(new Bus.EOS() {
             public void endOfStream(GstObject source) {
