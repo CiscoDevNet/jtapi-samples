@@ -44,6 +44,8 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
         >Note, ensure directory numbers have `Allow Control of Device from CTI` enabled
 
+    - One CTI Route Point and one CTI Port, each configured with one DN and associated to the CUCM user.
+
 **Tested With:**
 
 * Ubuntu 22.04
