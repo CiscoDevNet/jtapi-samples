@@ -51,7 +51,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 * Ubuntu 22.04
 * OpenJDK 8 / 11
 * Maven 3.6.3
-* CUCM 11.5 / 12.5 / 14
+* CUCM 11.5 / 12.5 / 14 / 15
 
 ## Getting started
 
@@ -107,7 +107,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
 
 ## Notes
 
-1. In this project, the 11.5, 12.5 and 14 versions of the JTAPI Java library have been deployed to the project's local Maven repo (in `lib/`), with 14 being the configured version. 
+1. In this project, the 11.5, 12.5, 14 and 15 versions of the JTAPI Java library have been deployed to the project's local Maven repo (in `lib/`), with 14 being the configured version. 
 
     If you want to use another deployed version, modify `pom.xml` to specify the desired JTAPI version dependency.  Modify `<version>`:
 
@@ -129,7 +129,7 @@ Visit the [DevNet JTAPI Site](https://developer.cisco.com/site/jtapi)
         mvn deploy:deploy-file -DgroupId=com.cisco.jtapi -DartifactId=jtapi -Dversion={version} -Durl=file:./lib -DrepositoryId=local-maven-repo -DupdateReleaseInfo=true -Dfile={/path/to/jtapi.jar}
         ```
 
-        >Note: be sure to update {version} and {/path/to/jtapi.jar} with your actual values
+        >Note: be sure to change {version} and {/path/to/jtapi.jar} with your actual values
 
 1. JTAPI configuration - e.g. trace log number/size/location and various timeouts - can be configured in `jtapi_config/jtapi.ini` (defined as a resource in `pom.xml`)
 
